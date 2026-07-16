@@ -21,9 +21,21 @@ const dom = new JSDOM(html, {
   resources: "usable"
 });
 
-//Handle fetch
-const fetchPkg = 'node_modules/whatwg-fetch/dist/fetch.umd.js';
-dom.window.eval(fs.readFileSync(fetchPkg, 'utf-8'));
+// Mock fetch instead of hitting the real network (avoids sandbox/network issues)
+const mockPosts = [
+  {
+    userId: 1,
+    id: 1,
+    title: "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+    body: "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+  }
+];
+
+dom.window.fetch = async (url) => {
+  return {
+    json: async () => mockPosts
+  };
+};
 
 // Inject the transformed JavaScript into the virtual DOM
 const scriptElement = dom.window.document.createElement("script");
